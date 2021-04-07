@@ -12,7 +12,7 @@ set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system)
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(include src ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ##############################################################################
 # Define package
@@ -46,6 +46,7 @@ add_library(laser_scan_filters
   src/array_filter.cpp
   src/box_filter.cpp
   src/polygon_filter.cpp
+  src/polygon_utils.cpp
   src/speckle_filter.cpp
   src/intensity_filter.cpp
 )
