@@ -85,8 +85,7 @@ Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& 
                              "i.e. [[x1, y1, z1], [x2, y2, z2]]");
   }
 
-  std::vector<geometry_msgs::Point32> points;
-  points.resize(box_xmlrpc.size());  // points.size() == 2
+  std::vector<geometry_msgs::Point32> points(box_xmlrpc.size());  // size must be 2
 
   for (int i = 0; i < box_xmlrpc.size(); ++i)
   {
@@ -130,8 +129,7 @@ Box makeBoxFromString(const std::string& box_string, const Box& last_box)
     return last_box;
   }
 
-  std::vector<geometry_msgs::Point32> points;
-  points.resize(vvf.size());  // points.size() == 2
+  std::vector<geometry_msgs::Point32> points(vvf.size());  // size must be 2
 
   for (unsigned int i = 0; i < vvf.size(); i++)
   {
