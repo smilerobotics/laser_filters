@@ -61,7 +61,7 @@ bool laser_filters::LaserScanBoxFilter::configure()
   bool x_min_set = getParam("min_x", min_x);
   bool y_min_set = getParam("min_y", min_y);
   bool z_min_set = getParam("min_z", min_z);
-  bool invert_set = getParam("invert", invert_filter);
+  bool invert_set = getParam("invert", invert_filter_);
 
   ROS_INFO("BOX filter started");
 
@@ -103,7 +103,7 @@ bool laser_filters::LaserScanBoxFilter::configure()
   if (!invert_set)
   {
     ROS_INFO("invert filter not set, assuming false");
-    invert_filter = false;
+    invert_filter_ = false;
   }
 
   return box_frame_set && x_max_set && y_max_set && z_max_set && x_min_set && y_min_set && z_min_set;
@@ -179,7 +179,7 @@ bool laser_filters::LaserScanBoxFilter::update(const sensor_msgs::LaserScan& inp
 
     tf::Point point(x, y, z);
 
-    if (!invert_filter)
+    if (!invert_filter_)
     {
       if (inBox(point))
       {

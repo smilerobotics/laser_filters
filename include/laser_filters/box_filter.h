@@ -42,8 +42,8 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
-#ifndef BOXFILTER_H
-#define BOXFILTER_H
+#ifndef BOX_FILTER_H
+#define BOX_FILTER_H
 
 #include <filters/filter_base.h>
 #include <laser_geometry/laser_geometry.h>
@@ -66,8 +66,9 @@ public:
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
 
 private:
-  bool inBox(tf::Point& point);
   std::string box_frame_;
+  bool invert_filter_;
+  bool up_and_running_;
   laser_geometry::LaserProjection projector_;
 
   // tf listener to transform scans into the box_frame
@@ -75,10 +76,10 @@ private:
 
   // defines two opposite corners of the box
   tf::Point min_, max_;
-  bool invert_filter;
-  bool up_and_running_;
-};
 
+  // checks if points in box
+  bool inBox(tf::Point& point);
+};
 }  // namespace laser_filters
 
-#endif /* box_filter.h */
+#endif  // BOX_FILTER_H
