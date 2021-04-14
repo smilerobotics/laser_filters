@@ -60,19 +60,17 @@ std::string boxToString(const Box& box)
   return box_string;
 }
 
-Box makeBoxFromTwoPoints(const std::vector<geometry_msgs::Point32>& points)
+Box makeBoxFromTwoPoints(const geometry_msgs::Point32& point0, const geometry_msgs::Point32& point1)
 {
   Box box;
-  if (points.size() == 2)
-  {
-    box.min.x = std::min(points[0].x, points[1].x);
-    box.min.y = std::min(points[0].y, points[1].y);
-    box.min.z = std::min(points[0].z, points[1].z);
 
-    box.max.x = std::max(points[0].x, points[1].x);
-    box.max.y = std::max(points[0].y, points[1].y);
-    box.max.z = std::max(points[0].z, points[1].z);
-  }
+  box.min.x = std::min(point0.x, point1.x);
+  box.min.y = std::min(point0.y, point1.y);
+  box.min.z = std::min(point0.z, point1.z);
+
+  box.max.x = std::max(point0.x, point1.x);
+  box.max.y = std::max(point0.y, point1.y);
+  box.max.z = std::max(point0.z, point1.z);
 
   return box;
 }
@@ -112,7 +110,7 @@ Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& 
     points[i].z = getNumberFromXMLRPC(point_xmlrpc[2], full_param_name);
   }
 
-  Box box = makeBoxFromTwoPoints(points);
+  Box box = makeBoxFromTwoPoints(points[0], points[1]);
   return box;
 }
 
@@ -154,7 +152,7 @@ Box makeBoxFromString(const std::string& box_string, const Box& last_box)
     }
   }
 
-  Box box = makeBoxFromTwoPoints(points);
+  Box box = makeBoxFromTwoPoints(points[0], points[1]);
   return box;
 }
 
