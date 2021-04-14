@@ -13,7 +13,8 @@ struct Box
   // z^  y       .---. .
   //  |/         |   |/
   //  .-> x  min .---.
-  geometry_msgs::Point32 min, max;
+  geometry_msgs::Point32 min;
+  geometry_msgs::Point32 max;
 };
 
 #endif
