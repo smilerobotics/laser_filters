@@ -46,11 +46,13 @@
 
 #include "laser_filters/box_filter.h"
 
-laser_filters::LaserScanBoxFilter::LaserScanBoxFilter()
+namespace laser_filters
+{
+LaserScanBoxFilter::LaserScanBoxFilter()
 {
 }
 
-bool laser_filters::LaserScanBoxFilter::configure()
+bool LaserScanBoxFilter::configure()
 {
   up_and_running_ = true;
   double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
@@ -109,8 +111,7 @@ bool laser_filters::LaserScanBoxFilter::configure()
   return box_frame_set && x_max_set && y_max_set && z_max_set && x_min_set && y_min_set && z_min_set;
 }
 
-bool laser_filters::LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan,
-                                               sensor_msgs::LaserScan& output_scan)
+bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
 {
   output_scan = input_scan;
   sensor_msgs::PointCloud2 laser_cloud;
@@ -198,8 +199,9 @@ bool laser_filters::LaserScanBoxFilter::update(const sensor_msgs::LaserScan& inp
   return true;
 }
 
-bool laser_filters::LaserScanBoxFilter::inBox(tf::Point& point)
+bool LaserScanBoxFilter::inBox(tf::Point& point)
 {
   return point.x() < max_.x() && point.x() > min_.x() && point.y() < max_.y() && point.y() > min_.y() &&
          point.z() < max_.z() && point.z() > min_.z();
 }
+}  // namespace laser_filters
