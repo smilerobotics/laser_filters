@@ -36,6 +36,7 @@
  */
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -46,18 +47,14 @@
 
 std::string boxToString(const Box& box)
 {
-  std::string box_string = "[";
+  std::stringstream box_stringstream;
+  box_stringstream << "["
+                   << "[" << box.min.x << ", " << box.min.y << ", " << box.min.z << "]"
+                   << ", "
+                   << "[" << box.max.x << ", " << box.max.y << ", " << box.max.z << "]"
+                   << "]";
 
-  box_string +=
-      "[" + std::to_string(box.min.x) + ", " + std::to_string(box.min.y) + ", " + std::to_string(box.min.z) + "]";
-
-  box_string += ", ";
-
-  box_string +=
-      "[" + std::to_string(box.max.x) + ", " + std::to_string(box.max.y) + ", " + std::to_string(box.max.z) + "]";
-
-  box_string += "]";
-  return box_string;
+  return box_stringstream.str();
 }
 
 Box makeBoxFromTwoPoints(const geometry_msgs::Point32& point0, const geometry_msgs::Point32& point1)
