@@ -9,11 +9,11 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,7 +32,7 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
@@ -42,20 +42,15 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
-
-
 #ifndef BOXFILTER_H
 #define BOXFILTER_H
 
 #include <filters/filter_base.h>
-
+#include <laser_geometry/laser_geometry.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
-#include <laser_geometry/laser_geometry.h>
-
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
-
 
 namespace laser_filters
 {
@@ -64,29 +59,26 @@ namespace laser_filters
  */
 class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 {
-  public:
-    LaserScanBoxFilter();
-    bool configure();
+public:
+  LaserScanBoxFilter();
+  bool configure();
 
-    bool update(
-      const sensor_msgs::LaserScan& input_scan,
-      sensor_msgs::LaserScan& filtered_scan);
+  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
 
-  private:
-    bool inBox(tf::Point &point);
-    std::string box_frame_;
-    laser_geometry::LaserProjection projector_;
-    
-    // tf listener to transform scans into the box_frame
-    tf::TransformListener tf_; 
-    
-    // defines two opposite corners of the box
-    tf::Point min_, max_; 
-    bool invert_filter;
-    bool up_and_running_;
+private:
+  bool inBox(tf::Point& point);
+  std::string box_frame_;
+  laser_geometry::LaserProjection projector_;
+
+  // tf listener to transform scans into the box_frame
+  tf::TransformListener tf_;
+
+  // defines two opposite corners of the box
+  tf::Point min_, max_;
+  bool invert_filter;
+  bool up_and_running_;
 };
 
-}
-
+}  // namespace laser_filters
 
 #endif /* box_filter.h */
