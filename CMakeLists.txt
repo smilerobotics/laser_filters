@@ -20,6 +20,7 @@ include_directories(include src ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # dynamic reconfigure
 generate_dynamic_reconfigure_options(
+  cfg/BoxFilter.cfg
   cfg/IntensityFilter.cfg
   cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
