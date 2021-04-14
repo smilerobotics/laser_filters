@@ -106,8 +106,7 @@ Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& 
     points[i].z = getNumberFromXMLRPC(point_xmlrpc[2], full_param_name);
   }
 
-  Box box = makeBoxFromTwoPoints(points[0], points[1]);
-  return box;
+  return makeBoxFromTwoPoints(points[0], points[1]);
 }
 
 Box makeBoxFromString(const std::string& box_string, const Box& last_box)
@@ -147,8 +146,7 @@ Box makeBoxFromString(const std::string& box_string, const Box& last_box)
     }
   }
 
-  Box box = makeBoxFromTwoPoints(points[0], points[1]);
-  return box;
+  return makeBoxFromTwoPoints(points[0], points[1]);
 }
 
 Box padBox(const Box& box, double padding)
