@@ -45,6 +45,7 @@
 #ifndef BOX_FILTER_H
 #define BOX_FILTER_H
 
+#include <dynamic_reconfigure/server.h>
 #include <filters/filter_base.h>
 #include <laser_geometry/laser_geometry.h>
 #include <sensor_msgs/LaserScan.h>
@@ -70,6 +71,10 @@ public:
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
 
 private:
+  // for dynamic configuration
+  std::shared_ptr<dynamic_reconfigure::Server<BoxFilterConfig>> dyn_server_;
+  boost::recursive_mutex own_mutex_;
+
   // parameters
   std::string box_frame_;
   Box box_;
@@ -89,6 +94,9 @@ private:
 
   // sets `max_` and `min_` from the argument
   void updateTfPoints(const Box& box);
+
+  // dynamic_reconfigure callback
+  void reconfigureCB(laser_filters::BoxFilterConfig& config, uint32_t level);
 };
 }  // namespace laser_filters
 

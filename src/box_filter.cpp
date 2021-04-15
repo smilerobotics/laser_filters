@@ -44,6 +44,7 @@
 
 #include <algorithm>
 
+#include <dynamic_reconfigure/server.h>
 #include <ros/ros.h>
 
 #include "box.h"
@@ -59,9 +60,11 @@ LaserScanBoxFilter::LaserScanBoxFilter()
 
 bool LaserScanBoxFilter::configure()
 {
+  up_and_running_ = true;
   XmlRpc::XmlRpcValue box_xmlrpc;
 
   ros::NodeHandle private_nh("~" + getName());
+  dyn_server_.reset(new dynamic_reconfigure::Server<BoxFilterConfig>(own_mutex_, private_nh));
 
   bool box_set = getParam("box", box_xmlrpc);
   bool box_frame_set = getParam("box_frame", box_frame_);
@@ -84,7 +87,23 @@ bool LaserScanBoxFilter::configure()
   }
 
   box_ = makeBoxFromXMLRPC(box_xmlrpc, "box");
+
+  double box_padding = 0;
+  getParam("box_padding", box_padding);
+
+  BoxFilterConfig param_config;
+  param_config.box = boxToString(box_);
+  param_config.box_padding = box_padding;
+  param_config.invert = invert_filter_;
+  dyn_server_->updateConfig(param_config);
+
+  box_ = padBox(box_, box_padding);
   updateTfPoints(box_);
+
+  // sets dynamic_reconfigure callback
+  dynamic_reconfigure::Server<BoxFilterConfig>::CallbackType f =
+      boost::bind(&LaserScanBoxFilter::reconfigureCB, this, _1, _2);
+  dyn_server_->setCallback(f);
 
   ROS_INFO("BOX filter started");
   return true;
@@ -190,6 +209,16 @@ void LaserScanBoxFilter::updateTfPoints(const Box& box)
   min_.setX(box.min.x);
   min_.setY(box.min.y);
   min_.setZ(box.min.z);
+
+  return;
+}
+
+void LaserScanBoxFilter::reconfigureCB(laser_filters::BoxFilterConfig& config, uint32_t level)
+{
+  invert_filter_ = config.invert;
+  box_ = makeBoxFromString(config.box, box_);
+  box_ = padBox(box_, config.box_padding);
+  updateTfPoints(box_);
 
   return;
 }
