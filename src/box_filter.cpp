@@ -42,8 +42,13 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
+#include <algorithm>
+
 #include <ros/ros.h>
 
+#include "box.h"
+#include "box_utils.h"
+#include "laser_filters/BoxFilterConfig.h"
 #include "laser_filters/box_filter.h"
 
 namespace laser_filters
@@ -54,61 +59,35 @@ LaserScanBoxFilter::LaserScanBoxFilter()
 
 bool LaserScanBoxFilter::configure()
 {
-  up_and_running_ = true;
-  double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
+  XmlRpc::XmlRpcValue box_xmlrpc;
+
+  ros::NodeHandle private_nh("~" + getName());
+
+  bool box_set = getParam("box", box_xmlrpc);
   bool box_frame_set = getParam("box_frame", box_frame_);
-  bool x_max_set = getParam("max_x", max_x);
-  bool y_max_set = getParam("max_y", max_y);
-  bool z_max_set = getParam("max_z", max_z);
-  bool x_min_set = getParam("min_x", min_x);
-  bool y_min_set = getParam("min_y", min_y);
-  bool z_min_set = getParam("min_z", min_z);
   bool invert_set = getParam("invert", invert_filter_);
 
-  ROS_INFO("BOX filter started");
-
-  max_.setX(max_x);
-  max_.setY(max_y);
-  max_.setZ(max_z);
-  min_.setX(min_x);
-  min_.setY(min_y);
-  min_.setZ(min_z);
-
+  if (!box_set)
+  {
+    ROS_ERROR("box is not set!");
+    return false;
+  }
   if (!box_frame_set)
   {
     ROS_ERROR("box_frame is not set!");
-  }
-  if (!x_max_set)
-  {
-    ROS_ERROR("max_x is not set!");
-  }
-  if (!y_max_set)
-  {
-    ROS_ERROR("max_y is not set!");
-  }
-  if (!z_max_set)
-  {
-    ROS_ERROR("max_z is not set!");
-  }
-  if (!x_min_set)
-  {
-    ROS_ERROR("min_x is not set!");
-  }
-  if (!y_min_set)
-  {
-    ROS_ERROR("min_y is not set!");
-  }
-  if (!z_min_set)
-  {
-    ROS_ERROR("min_z is not set!");
+    return false;
   }
   if (!invert_set)
   {
-    ROS_INFO("invert filter not set, assuming false");
+    ROS_WARN("invert_filter is not set, assuming false");
     invert_filter_ = false;
   }
 
-  return box_frame_set && x_max_set && y_max_set && z_max_set && x_min_set && y_min_set && z_min_set;
+  box_ = makeBoxFromXMLRPC(box_xmlrpc, "box");
+  updateTfPoints(box_);
+
+  ROS_INFO("BOX filter started");
+  return true;
 }
 
 bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
@@ -124,7 +103,7 @@ bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor
                                       ros::Duration(1.0), ros::Duration(0.01), &error_msg);
   if (!success)
   {
-    ROS_WARN("Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+    ROS_WARN("Could not get transform, ignoring laser scan! %s", error_msg.c_str());
     return false;
   }
 
@@ -165,10 +144,7 @@ bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor
   const long int limit = pstep * pcount;
 
   int i_idx, x_idx, y_idx, z_idx;
-  for (i_idx = i_idx_offset, x_idx = x_idx_offset, y_idx = y_idx_offset, z_idx = z_idx_offset;
-
-       x_idx < limit;
-
+  for (i_idx = i_idx_offset, x_idx = x_idx_offset, y_idx = y_idx_offset, z_idx = z_idx_offset; x_idx < limit;
        i_idx += pstep, x_idx += pstep, y_idx += pstep, z_idx += pstep)
   {
     // TODO works only for float data types and with an index field
@@ -199,9 +175,22 @@ bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor
   return true;
 }
 
-bool LaserScanBoxFilter::inBox(tf::Point& point)
+bool LaserScanBoxFilter::inBox(const tf::Point& point)
 {
   return point.x() < max_.x() && point.x() > min_.x() && point.y() < max_.y() && point.y() > min_.y() &&
          point.z() < max_.z() && point.z() > min_.z();
+}
+
+void LaserScanBoxFilter::updateTfPoints(const Box& box)
+{
+  max_.setX(box.max.x);
+  max_.setY(box.max.y);
+  max_.setZ(box.max.z);
+
+  min_.setX(box.min.x);
+  min_.setY(box.min.y);
+  min_.setZ(box.min.z);
+
+  return;
 }
 }  // namespace laser_filters

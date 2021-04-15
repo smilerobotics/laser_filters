@@ -52,6 +52,10 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 
+#include "box.h"
+#include "box_utils.h"
+#include "laser_filters/BoxFilterConfig.h"
+
 namespace laser_filters
 {
 /**
@@ -66,7 +70,10 @@ public:
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
 
 private:
+  // parameters
   std::string box_frame_;
+  Box box_;
+  double box_padding_;
   bool invert_filter_;
   bool up_and_running_;
   laser_geometry::LaserProjection projector_;
@@ -78,7 +85,10 @@ private:
   tf::Point min_, max_;
 
   // checks if points in box
-  bool inBox(tf::Point& point);
+  bool inBox(const tf::Point& point);
+
+  // sets `max_` and `min_` from the argument
+  void updateTfPoints(const Box& box);
 };
 }  // namespace laser_filters
 
