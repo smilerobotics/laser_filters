@@ -42,8 +42,12 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
+#include <string>
+
+#include <geometry_msgs/PolygonStamped.h>
 #include <ros/ros.h>
 
+#include "box_utils.h"
 #include "laser_filters/box_filter.h"
 
 namespace laser_filters
@@ -54,6 +58,9 @@ LaserScanBoxFilter::LaserScanBoxFilter()
 
 bool LaserScanBoxFilter::configure()
 {
+  ros::NodeHandle private_nh("~" + getName());
+  box_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("box", 1);
+
   up_and_running_ = true;
   double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
   bool box_frame_set = getParam("box_frame", box_frame_);
@@ -66,6 +73,13 @@ bool LaserScanBoxFilter::configure()
   bool invert_set = getParam("invert", invert_filter_);
 
   ROS_INFO("BOX filter started");
+
+  box_.max.x = max_x;
+  box_.max.y = max_y;
+  box_.max.z = max_z;
+  box_.min.x = min_x;
+  box_.min.y = min_y;
+  box_.min.z = min_z;
 
   max_.setX(max_x);
   max_.setY(max_y);
@@ -113,6 +127,13 @@ bool LaserScanBoxFilter::configure()
 
 bool LaserScanBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
 {
+  // publishes a box shape
+  geometry_msgs::PolygonStamped box_msg_stamped;
+  box_msg_stamped.header.frame_id = box_frame_;
+  box_msg_stamped.header.stamp = ros::Time::now();
+  box_msg_stamped.polygon = makePolygonFromBox(box_);
+  box_pub_.publish(box_msg_stamped);
+
   output_scan = input_scan;
   sensor_msgs::PointCloud2 laser_cloud;
 
