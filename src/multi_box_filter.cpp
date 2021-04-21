@@ -189,8 +189,8 @@ bool LaserScanMultiBoxFilter::update(const sensor_msgs::LaserScan& input_scan, s
 
 bool LaserScanMultiBoxFilter::inBox(const tf::Point& point)
 {
-  return point.x() < max_.x() && point.x() > min_.x() && point.y() < max_.y() && point.y() > min_.y() &&
-         point.z() < max_.z() && point.z() > min_.z();
+  return point.x() <= max_.x() && point.x() >= min_.x() && point.y() <= max_.y() && point.y() >= min_.y() &&
+         point.z() <= max_.z() && point.z() >= min_.z();
 }
 
 void LaserScanMultiBoxFilter::updateTfPoints(const Box& box)
