@@ -74,41 +74,72 @@ Box makeBoxFromTwoPoints(const geometry_msgs::Point32& point0, const geometry_ms
   return box;
 }
 
+std::vector<Box> makeBoxArrayFromXMLRPC(const XmlRpc::XmlRpcValue& box_array_xmlrpc, const std::string& full_param_name)
+{
+  // checks if the array has at least one elements.
+  if (box_array_xmlrpc.getType() != XmlRpc::XmlRpcValue::TypeArray || box_array_xmlrpc.size() == 0)
+  {
+    ROS_FATAL("The box array (parameter %s) must have at least one box, "
+              "e.g. [[[x1, y1, z1], [x2, y2, z2]]]",
+              full_param_name.c_str());
+
+    throw std::runtime_error("The box array must have at least one box, "
+                             "e.g. [[[x1, y1, z1], [x2, y2, z2]]]");
+  }
+
+  std::vector<Box> box_array(box_array_xmlrpc.size());
+
+  for (int i = 0; i < box_array_xmlrpc.size(); ++i)
+  {
+    XmlRpc::XmlRpcValue box_xmlrpc = box_array_xmlrpc[i];
+    box_array[i] = makeBoxFromXMLRPC(box_xmlrpc, full_param_name);
+  }
+
+  return box_array;
+}
+
 Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& full_param_name)
 {
   // checks if an array has just two elements.
   if (box_xmlrpc.getType() != XmlRpc::XmlRpcValue::TypeArray || box_xmlrpc.size() != 2)
   {
-    ROS_FATAL("The box (parameter %s) must be specified as nested list on the parameter server with two points"
-              "i.e. [[x1, y1, z1], [x2, y2, z2]]",
+    ROS_FATAL("A box in parameter %s must be specified as a list of two points, "
+              "i.e. [[x1, y1, z1], [x2, y2, z2]], but a box written in another format is found.",
               full_param_name.c_str());
 
-    throw std::runtime_error("The box must be specified as nested list on the parameter server with two points"
-                             "i.e. [[x1, y1, z1], [x2, y2, z2]]");
+    throw std::runtime_error("A box must be specified as a list of two points, "
+                             "i.e. [[x1, y1, z1], [x2, y2, z2]], but a box written in another format is found.");
   }
 
   std::vector<geometry_msgs::Point32> points(box_xmlrpc.size());  // size must be 2
 
   for (int i = 0; i < box_xmlrpc.size(); ++i)
   {
-    // checks if each element (point) has three elements,
-    // i.e. x, y, and z coordinates
     XmlRpc::XmlRpcValue point_xmlrpc = box_xmlrpc[i];
-    if (point_xmlrpc.getType() != XmlRpc::XmlRpcValue::TypeArray || point_xmlrpc.size() != 3)
-    {
-      ROS_FATAL("The box (parameter %s) must be specified as list of lists,"
-                "i.e. [[x1, y1, z1], [x2, y2, z2]], but this spec is not of that form.",
-                full_param_name.c_str());
-      throw std::runtime_error("The box must be specified as list of lists,"
-                               "i.e. [[x1, y1, z1], [x2, y2, z2]], but this spec is not of that form");
-    }
-
-    points[i].x = getNumberFromXMLRPC(point_xmlrpc[0], full_param_name);
-    points[i].y = getNumberFromXMLRPC(point_xmlrpc[1], full_param_name);
-    points[i].z = getNumberFromXMLRPC(point_xmlrpc[2], full_param_name);
+    points[i] = makePointFromXMLRPC(point_xmlrpc, full_param_name);
   }
 
   return makeBoxFromTwoPoints(points[0], points[1]);
+}
+
+geometry_msgs::Point32 makePointFromXMLRPC(XmlRpc::XmlRpcValue& point_xmlrpc, const std::string& full_param_name)
+{
+  // checks if each element (point) has three elements,
+  // i.e. x, y, and z coordinates
+  if (point_xmlrpc.getType() != XmlRpc::XmlRpcValue::TypeArray || point_xmlrpc.size() != 3)
+  {
+    ROS_FATAL("A point in parameter %s must be specified as a list of three coordinates, "
+              "i.e. [x, y, z], but a point written in another format is found.",
+              full_param_name.c_str());
+    throw std::runtime_error("A point in parameter %s must be specified as list of lists, "
+                             "i.e. [x, y, z], but a point written in another format is found.");
+  }
+
+  geometry_msgs::Point32 point;
+  point.x = getNumberFromXMLRPC(point_xmlrpc[0], full_param_name);
+  point.y = getNumberFromXMLRPC(point_xmlrpc[1], full_param_name);
+  point.z = getNumberFromXMLRPC(point_xmlrpc[2], full_param_name);
+  return point;
 }
 
 Box makeBoxFromString(const std::string& box_string, const Box& last_box)
