@@ -47,6 +47,7 @@ add_library(laser_scan_filters
   src/array_filter.cpp
   src/box_filter.cpp
   src/box_utils.cpp
+  src/multi_box_filter.cpp
   src/polygon_filter.cpp
   src/polygon_utils.cpp
   src/speckle_filter.cpp
