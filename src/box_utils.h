@@ -45,10 +45,13 @@
 #include "box.h"
 #include "polygon_utils.h"
 
+namespace laser_filters
+{
 std::string boxToString(const Box& box);
 Box makeBoxFromTwoPoints(const geometry_msgs::Point32& point0, const geometry_msgs::Point32& point1);
 Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& full_param_name);
 Box makeBoxFromString(const std::string& box_string, const Box& last_box);
 Box padBox(const Box& box, double padding);
+}  // namespace laser_filters
 
 #endif

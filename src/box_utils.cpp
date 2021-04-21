@@ -45,6 +45,8 @@
 
 #include "box_utils.h"
 
+namespace laser_filters
+{
 std::string boxToString(const Box& box)
 {
   std::stringstream box_stringstream;
@@ -164,3 +166,4 @@ Box padBox(const Box& box, double padding)
 
   return box_padded;
 }
+}  // namespace laser_filters
