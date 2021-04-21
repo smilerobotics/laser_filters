@@ -8,6 +8,8 @@
 
 #include "polygon_utils.h"
 
+namespace laser_filters
+{
 /** @brief Same as sign(x) but returns 0 if x is 0. */
 inline double sign0(double x)
 {
@@ -206,3 +208,4 @@ std::string polygonToString(geometry_msgs::Polygon polygon)
   polygon_string += "]";
   return polygon_string;
 }
+}  // namespace laser_filters
