@@ -40,6 +40,8 @@
 
 #include <geometry_msgs/Point32.h>
 
+namespace laser_filters
+{
 struct Box
 {
   // A box (cuboid) in without rotation can be described by two different points
@@ -53,5 +55,6 @@ struct Box
   geometry_msgs::Point32 min;
   geometry_msgs::Point32 max;
 };
+}  // namespace laser_filters
 
 #endif
