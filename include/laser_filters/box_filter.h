@@ -52,6 +52,8 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 
+#include "box.h"
+
 namespace laser_filters
 {
 /**
@@ -66,7 +68,10 @@ public:
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
 
 private:
+  ros::Publisher box_pub_;
+
   std::string box_frame_;
+  Box box_;
   bool invert_filter_;
   bool up_and_running_;
   laser_geometry::LaserProjection projector_;

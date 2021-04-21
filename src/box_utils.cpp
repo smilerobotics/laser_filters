@@ -149,6 +149,22 @@ Box makeBoxFromString(const std::string& box_string, const Box& last_box)
   return makeBoxFromTwoPoints(points[0], points[1]);
 }
 
+geometry_msgs::Polygon makePolygonFromBox(const Box& box)
+{
+  geometry_msgs::Polygon box_msg;
+  box_msg.points.resize(4);
+  box_msg.points[0].x = box.max.x;
+  box_msg.points[0].y = box.max.y;
+  box_msg.points[1].x = box.min.x;
+  box_msg.points[1].y = box.max.y;
+  box_msg.points[2].x = box.min.x;
+  box_msg.points[2].y = box.min.y;
+  box_msg.points[3].x = box.max.x;
+  box_msg.points[3].y = box.min.y;
+
+  return box_msg;
+}
+
 Box padBox(const Box& box, double padding)
 {
   Box box_padded = box;
