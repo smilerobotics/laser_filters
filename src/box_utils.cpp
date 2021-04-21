@@ -182,4 +182,90 @@ Box padBox(const Box& box, double padding)
 
   return box_padded;
 }
+
+std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input, std::string& error_return)
+{
+  std::stringstream input_ss(input);
+  int depth = 0;
+
+  std::vector<float> current_vector;
+  std::vector<std::vector<float>> current_vvf;
+  std::vector<std::vector<std::vector<float>>> result;
+
+  while (!!input_ss && !input_ss.eof())
+  {
+    switch (input_ss.peek())
+    {
+      case EOF:
+        break;
+      case '[':
+        depth++;
+        if (depth == 2)
+        {
+          current_vvf.clear();
+        }
+        else if (depth == 3)
+        {
+          current_vector.clear();
+        }
+        else if (depth > 3)
+        {
+          error_return = "Array depth greater than 3";
+          return result;
+        }
+        input_ss.get();
+        break;
+      case ']':
+        depth--;
+        if (depth < 0)
+        {
+          error_return = "More close ] than open [";
+          return result;
+        }
+        else if (depth == 1)
+        {
+          result.push_back(current_vvf);
+        }
+        else if (depth == 2)
+        {
+          current_vvf.push_back(current_vector);
+        }
+        input_ss.get();
+        break;
+      case ',':
+      case ' ':
+      case '\t':
+        input_ss.get();
+        break;
+      default:  // All other characters should be part of the numbers.
+        if (depth != 3)
+        {
+          std::stringstream err_ss;
+          err_ss << "Numbers at depth " << depth << " . Char was '" << char(input_ss.peek()) << "'.";
+          error_return = err_ss.str();
+          return result;
+        }
+
+        // reads a float value
+        float value;
+        input_ss >> value;
+        if (!!input_ss)
+        {
+          current_vector.push_back(value);
+        }
+        break;
+    }
+  }
+
+  if (depth != 0)
+  {
+    error_return = "Unterminated vector string.";
+  }
+  else
+  {
+    error_return = "";
+  }
+
+  return result;
+}
 }  // namespace laser_filters
