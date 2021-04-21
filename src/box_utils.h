@@ -59,6 +59,9 @@ geometry_msgs::Point32 makePointFromXMLRPC(XmlRpc::XmlRpcValue& point_xmlrpc, co
 Box makeBoxFromString(const std::string& box_string, const Box& last_box);
 geometry_msgs::Polygon makePolygonFromBox(const Box& box);
 Box padBox(const Box& box, double padding);
+
+std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input, std::string& error_return);
+
 }  // namespace laser_filters
 
 #endif
