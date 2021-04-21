@@ -1,4 +1,5 @@
-<package>
+<?xml version="1.0"?>
+<package format="2">
   <name>laser_filters</name>
   <description>
     Assorted filters designed to operate on 2D planar laser scanners,
@@ -24,15 +25,15 @@
   <build_depend>rostest</build_depend>
   <build_depend>angles</build_depend>
 
-  <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>filters</run_depend>
-  <run_depend>message_filters</run_depend>
-  <run_depend>laser_geometry</run_depend>
-  <run_depend>pluginlib</run_depend>
-  <run_depend>angles</run_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>filters</exec_depend>
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>laser_geometry</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>angles</exec_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
