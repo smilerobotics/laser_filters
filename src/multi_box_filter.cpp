@@ -54,18 +54,18 @@ LaserScanMultiBoxFilter::LaserScanMultiBoxFilter()
 bool LaserScanMultiBoxFilter::configure()
 {
   up_and_running_ = true;
-  XmlRpc::XmlRpcValue box_xmlrpc;
+  XmlRpc::XmlRpcValue box_array_xmlrpc;
 
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<BoxFilterConfig>(own_mutex_, private_nh));
 
-  bool box_set = getParam("box", box_xmlrpc);
+  bool box_set = getParam("box_array", box_array_xmlrpc);
   bool box_frame_set = getParam("box_frame", box_frame_);
   bool invert_set = getParam("invert", invert_filter_);
 
   if (!box_set)
   {
-    ROS_ERROR("box is not set!");
+    ROS_ERROR("box_array is not set!");
     return false;
   }
   if (!box_frame_set)
@@ -79,19 +79,19 @@ bool LaserScanMultiBoxFilter::configure()
     invert_filter_ = false;
   }
 
-  box_ = makeBoxFromXMLRPC(box_xmlrpc, "box");
+  box_array_ = makeBoxArrayFromXMLRPC(box_array_xmlrpc, "box_array");
 
   double box_padding = 0;
   getParam("box_padding", box_padding);
 
   BoxFilterConfig param_config;
-  param_config.box = boxToString(box_);
+  param_config.box_array = boxArrayToString(box_array_);
   param_config.box_padding = box_padding;
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
 
-  box_ = padBox(box_, box_padding);
-  updateTfPoints(box_);
+  box_array_ = padBoxArray(box_array_, box_padding);
+  updateTfPoints(box_array_);
 
   // sets dynamic_reconfigure callback
   dynamic_reconfigure::Server<BoxFilterConfig>::CallbackType f =
@@ -189,19 +189,27 @@ bool LaserScanMultiBoxFilter::update(const sensor_msgs::LaserScan& input_scan, s
 
 bool LaserScanMultiBoxFilter::inBox(const tf::Point& point)
 {
-  return point.x() < max_.x() && point.x() > min_.x() && point.y() < max_.y() && point.y() > min_.y() &&
-         point.z() < max_.z() && point.z() > min_.z();
+  bool result = false;
+  for (unsigned int i = 0; i < max_.size() && !result; ++i)
+  {
+    result |= point.x() < max_[i].x() && point.x() > min_[i].x() && point.y() < max_[i].y() &&
+              point.y() > min_[i].y() && point.z() < max_[i].z() && point.z() > min_[i].z();
+  }
+  return result;
 }
 
-void LaserScanMultiBoxFilter::updateTfPoints(const Box& box)
+void LaserScanMultiBoxFilter::updateTfPoints(const std::vector<Box>& box_array)
 {
-  max_.setX(box.max.x);
-  max_.setY(box.max.y);
-  max_.setZ(box.max.z);
+  max_.clear();
+  max_.reserve(box_array.size());
+  min_.clear();
+  min_.reserve(box_array.size());
 
-  min_.setX(box.min.x);
-  min_.setY(box.min.y);
-  min_.setZ(box.min.z);
+  for (unsigned int i = 0; i < box_array.size(); ++i)
+  {
+    max_.push_back(tf::Point(box_array[i].max.x, box_array[i].max.y, box_array[i].max.z));
+    min_.push_back(tf::Point(box_array[i].min.x, box_array[i].min.y, box_array[i].min.z));
+  }
 
   return;
 }
@@ -209,9 +217,9 @@ void LaserScanMultiBoxFilter::updateTfPoints(const Box& box)
 void LaserScanMultiBoxFilter::reconfigureCB(laser_filters::BoxFilterConfig& config, uint32_t level)
 {
   invert_filter_ = config.invert;
-  Box box_new = makeBoxFromString(config.box, box_);
-  box_ = padBox(box_new, config.box_padding);
-  updateTfPoints(box_);
+  std::vector<Box> box_array_new = makeBoxArrayFromString(config.box_array, box_array_);
+  box_array_ = padBoxArray(box_array_new, config.box_padding);
+  updateTfPoints(box_array_);
 
   return;
 }

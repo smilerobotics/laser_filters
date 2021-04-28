@@ -58,7 +58,7 @@ std::vector<Box> makeBoxArrayFromXMLRPC(const XmlRpc::XmlRpcValue& box_array_xml
 Box makeBoxFromXMLRPC(const XmlRpc::XmlRpcValue& box_xmlrpc, const std::string& full_param_name);
 geometry_msgs::Point32 makePointFromXMLRPC(XmlRpc::XmlRpcValue& point_xmlrpc, const std::string& full_param_name);
 
-Box makeBoxFromString(const std::string& box_string, const Box& last_box);
+std::vector<Box> makeBoxArrayFromString(const std::string& box_string, const std::vector<Box>& last_box_array);
 geometry_msgs::Polygon makePolygonFromBox(const Box& box);
 
 Box padBox(const Box& box, double padding);
