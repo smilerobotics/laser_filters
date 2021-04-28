@@ -44,6 +44,7 @@
 #include <ros/ros.h>
 
 #include "box_utils.h"
+#include "polygon_utils.h"
 
 namespace laser_filters
 {
@@ -57,6 +58,19 @@ std::string boxToString(const Box& box)
                    << "]";
 
   return box_stringstream.str();
+}
+
+std::string boxArrayToString(const std::vector<Box>& box_array)
+{
+  std::stringstream box_array_stringstream;
+  box_array_stringstream << "[";
+  for (Box box : box_array)
+  {
+    box_array_stringstream << boxToString(box);
+  }
+  box_array_stringstream << "]";
+
+  return box_array_stringstream.str();
 }
 
 Box makeBoxFromTwoPoints(const geometry_msgs::Point32& point0, const geometry_msgs::Point32& point1)
@@ -212,6 +226,15 @@ Box padBox(const Box& box, double padding)
   box_padded.max.z += padding;
 
   return box_padded;
+}
+
+std::vector<Box> padBoxArray(const std::vector<Box>& box_array, double padding)
+{
+  std::vector<Box> box_array_padded(box_array.size());
+  std::transform(box_array.cbegin(), box_array.cend(), box_array_padded.begin(),
+                 [&padding](const Box box) -> Box { return padBox(box, padding); });
+
+  return box_array_padded;
 }
 
 std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input, std::string& error_return)
