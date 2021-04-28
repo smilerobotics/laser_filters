@@ -64,9 +64,13 @@ std::string boxArrayToString(const std::vector<Box>& box_array)
 {
   std::stringstream box_array_stringstream;
   box_array_stringstream << "[";
-  for (Box box : box_array)
+  for (int i = 0; i < box_array.size(); ++i)
   {
-    box_array_stringstream << boxToString(box);
+    box_array_stringstream << boxToString(box_array[i]);
+    if (i != box_array.size() - 1)
+    {
+      box_array_stringstream << ", ";
+    }
   }
   box_array_stringstream << "]";
 
@@ -230,8 +234,9 @@ Box padBox(const Box& box, double padding)
 
 std::vector<Box> padBoxArray(const std::vector<Box>& box_array, double padding)
 {
-  std::vector<Box> box_array_padded(box_array.size());
-  std::transform(box_array.cbegin(), box_array.cend(), box_array_padded.begin(),
+  std::vector<Box> box_array_padded;
+  box_array_padded.reserve(box_array.size());
+  std::transform(box_array.cbegin(), box_array.cend(), std::back_inserter(box_array_padded),
                  [&padding](const Box box) -> Box { return padBox(box, padding); });
 
   return box_array_padded;
