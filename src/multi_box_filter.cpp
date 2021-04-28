@@ -207,8 +207,8 @@ void LaserScanMultiBoxFilter::updateTfPoints(const std::vector<Box>& box_array)
 
   for (unsigned int i = 0; i < box_array.size(); ++i)
   {
-    max_.push_back(tf::Point(box_array[i].max.x, box_array[i].max.y, box_array[i].max.z));
-    min_.push_back(tf::Point(box_array[i].min.x, box_array[i].min.y, box_array[i].min.z));
+    max_.emplace_back(box_array[i].max.x, box_array[i].max.y, box_array[i].max.z);
+    min_.emplace_back(box_array[i].min.x, box_array[i].min.y, box_array[i].min.z);
   }
 
   return;
@@ -217,7 +217,7 @@ void LaserScanMultiBoxFilter::updateTfPoints(const std::vector<Box>& box_array)
 void LaserScanMultiBoxFilter::reconfigureCB(laser_filters::BoxFilterConfig& config, uint32_t level)
 {
   invert_filter_ = config.invert;
-  std::vector<Box> box_array_new = makeBoxArrayFromString(config.box_array, box_array_);
+  const std::vector<Box> box_array_new = makeBoxArrayFromString(config.box_array, box_array_);
   box_array_ = padBoxArray(box_array_new, config.box_padding);
   updateTfPoints(box_array_);
 
