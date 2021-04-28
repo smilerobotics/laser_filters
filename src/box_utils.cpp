@@ -230,7 +230,7 @@ std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input,
       case EOF:
         break;
       case '[':
-        depth++;
+        ++depth;
         if (depth == 2)
         {
           current_vvf.clear();
@@ -247,7 +247,7 @@ std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input,
         input_ss.get();
         break;
       case ']':
-        depth--;
+        --depth;
         if (depth < 0)
         {
           error_return = "More close ] than open [";
@@ -278,7 +278,7 @@ std::vector<std::vector<std::vector<float>>> parseVVVF(const std::string& input,
         }
 
         // reads a float value
-        float value;
+        float value = 0.0f;
         input_ss >> value;
         if (!!input_ss)
         {
