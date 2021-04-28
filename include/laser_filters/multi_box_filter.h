@@ -38,6 +38,10 @@
 #ifndef MULTI_BOX_FILTER_H
 #define MULTI_BOX_FILTER_H
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <dynamic_reconfigure/server.h>
 #include <filters/filter_base.h>
 #include <laser_geometry/laser_geometry.h>
@@ -70,7 +74,7 @@ private:
 
   // parameters
   std::string box_frame_;
-  Box box_;
+  std::vector<Box> box_array_;
   double box_padding_;
   bool invert_filter_;
   bool up_and_running_;
@@ -80,13 +84,14 @@ private:
   tf::TransformListener tf_;
 
   // defines two opposite corners of the box
-  tf::Point min_, max_;
+  std::vector<tf::Point> max_;
+  std::vector<tf::Point> min_;
 
   // checks if points in box
   bool inBox(const tf::Point& point);
 
   // sets `max_` and `min_` from the argument
-  void updateTfPoints(const Box& box);
+  void updateTfPoints(const std::vector<Box>& box_array);
 
   // dynamic_reconfigure callback
   void reconfigureCB(laser_filters::BoxFilterConfig& config, uint32_t level);

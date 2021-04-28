@@ -1,7 +1,7 @@
 scan_filter_chain:
-- name: box_filter
+- name: muli_box_filter
   type: laser_filters/LaserScanMultiBoxFilter
   params:
     box_frame: base_link
-    box: [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]
+    box_array: [[[0, 0, -1], [1, 1, 1]], [[0, 0, -1], [0.5, -1, 1]]]
     invert: false

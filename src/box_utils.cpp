@@ -160,44 +160,56 @@ geometry_msgs::Point32 makePointFromXMLRPC(XmlRpc::XmlRpcValue& point_xmlrpc, co
   return point;
 }
 
-Box makeBoxFromString(const std::string& box_string, const Box& last_box)
+std::vector<Box> makeBoxArrayFromString(const std::string& box_array_string, const std::vector<Box>& last_box_array)
 {
   std::string error;
-  std::vector<std::vector<float>> vvf = parseVVF(box_string, error);
+  std::vector<std::vector<std::vector<float>>> vvvf = parseVVVF(box_array_string, error);
 
   if (error != "")
   {
     ROS_ERROR("Error parsing box parameter: '%s'", error.c_str());
-    ROS_ERROR(" Box string was '%s'.", box_string.c_str());
-    return last_box;
+    ROS_ERROR(" Box array string was '%s'.", box_array_string.c_str());
+    return last_box_array;
   }
 
-  // convert vvf into points.
-  if (vvf.size() != 2)
+  // converts VVVF into a box array
+  if (vvvf.size() < 0)
   {
-    ROS_WARN("You must specify just two points to define a box");
-    return last_box;
+    ROS_WARN("You must specify at least one box.");
+    return last_box_array;
   }
 
-  std::vector<geometry_msgs::Point32> points(vvf.size());  // size must be 2
-
-  for (unsigned int i = 0; i < vvf.size(); i++)
+  std::vector<Box> new_box_array;
+  new_box_array.reserve(vvvf.size());
+  for (std::vector<std::vector<float>> vvf : vvvf)
   {
-    if (vvf[i].size() == 3)
+    if (vvf.size() != 2)
     {
-      points[i].x = vvf[i][0];
-      points[i].y = vvf[i][1];
-      points[i].z = vvf[i][2];
+      ROS_WARN("You must specify just two points to define a box");
+      return last_box_array;
     }
-    else
+
+    std::vector<geometry_msgs::Point32> points(vvf.size());  // size must be 2
+    for (unsigned int i = 0; i < vvf.size(); ++i)
     {
-      ROS_ERROR("The box must be specified as list of lists,"
-                "i.e. [[x1, y1, z1], [x2, y2, z2]], but this spec is not of that form");
-      return last_box;
+      if (vvf[i].size() == 3)
+      {
+        points[i].x = vvf[i][0];
+        points[i].y = vvf[i][1];
+        points[i].z = vvf[i][2];
+      }
+      else
+      {
+        ROS_WARN("A point must be specified as a list of three coordinates, "
+                 "i.e. [x, y, z], but a point written in another format is found.");
+        return last_box_array;
+      }
     }
+
+    new_box_array.push_back(makeBoxFromTwoPoints(points[0], points[1]));
   }
 
-  return makeBoxFromTwoPoints(points[0], points[1]);
+  return new_box_array;
 }
 
 geometry_msgs::Polygon makePolygonFromBox(const Box& box)
