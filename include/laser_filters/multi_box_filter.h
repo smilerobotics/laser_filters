@@ -45,6 +45,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <filters/filter_base.h>
 #include <laser_geometry/laser_geometry.h>
+#include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <tf/transform_datatypes.h>
@@ -71,6 +72,9 @@ private:
   // for dynamic configuration
   std::shared_ptr<dynamic_reconfigure::Server<BoxFilterConfig>> dyn_server_;
   boost::recursive_mutex own_mutex_;
+
+  // publishers
+  ros::Publisher box_array_pub_;
 
   // parameters
   std::string box_frame_;
