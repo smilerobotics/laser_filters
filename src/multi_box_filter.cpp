@@ -119,7 +119,7 @@ bool LaserScanMultiBoxFilter::update(const sensor_msgs::LaserScan& input_scan, s
   geometry_msgs::PolygonStamped box_msg_stamped;
   box_msg_stamped.header.frame_id = box_frame_;
   box_msg_stamped.header.stamp = now;
-  for (Box box : box_array_)
+  for (const Box &box : box_array_)
   {
     box_msg_stamped.polygon = makePolygonFromBox(box);
     box_array_msg.polygons.push_back(box_msg_stamped);
