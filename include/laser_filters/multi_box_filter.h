@@ -50,6 +50,7 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "box.h"
 #include "box_utils.h"

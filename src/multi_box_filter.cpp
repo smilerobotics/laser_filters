@@ -41,6 +41,7 @@
 #include <geometry_msgs/PolygonStamped.h>
 #include <jsk_recognition_msgs/PolygonArray.h>
 #include <ros/ros.h>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 #include "box.h"
 #include "box_utils.h"
@@ -109,6 +110,9 @@ bool LaserScanMultiBoxFilter::configure()
 
 bool LaserScanMultiBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
 {
+  // prevents the box array from updating in this function
+  boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
   // publishes the box array
   ros::Time now = ros::Time::now();
   jsk_recognition_msgs::PolygonArray box_array_msg;
