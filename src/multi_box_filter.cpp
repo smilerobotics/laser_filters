@@ -38,6 +38,8 @@
 #include <algorithm>
 
 #include <dynamic_reconfigure/server.h>
+#include <geometry_msgs/PolygonStamped.h>
+#include <jsk_recognition_msgs/PolygonArray.h>
 #include <ros/ros.h>
 
 #include "box.h"
@@ -98,12 +100,33 @@ bool LaserScanMultiBoxFilter::configure()
       boost::bind(&LaserScanMultiBoxFilter::reconfigureCB, this, _1, _2);
   dyn_server_->setCallback(f);
 
+  // initializes a publisher
+  box_array_pub_ = private_nh.advertise<jsk_recognition_msgs::PolygonArray>("box_array", 1);
+
   ROS_INFO("Multi Box Filter started");
   return true;
 }
 
 bool LaserScanMultiBoxFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
 {
+  // publishes the box array
+  ros::Time now = ros::Time::now();
+  jsk_recognition_msgs::PolygonArray box_array_msg;
+  box_array_msg.header.frame_id = box_frame_;
+  box_array_msg.header.stamp = now;
+  box_array_msg.polygons.reserve(box_array_.size());
+
+  geometry_msgs::PolygonStamped box_msg_stamped;
+  box_msg_stamped.header.frame_id = box_frame_;
+  box_msg_stamped.header.stamp = now;
+  for (Box box : box_array_)
+  {
+    box_msg_stamped.polygon = makePolygonFromBox(box);
+    box_array_msg.polygons.push_back(box_msg_stamped);
+  }
+  box_array_pub_.publish(box_array_msg);
+
+  // filters scan data
   output_scan = input_scan;
   sensor_msgs::PointCloud2 laser_cloud;
 

@@ -24,6 +24,8 @@
   <build_depend>pluginlib</build_depend>
   <build_depend>rostest</build_depend>
   <build_depend>angles</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>jsk_recognition_msgs</build_depend>
 
   <exec_depend>dynamic_reconfigure</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
@@ -34,6 +36,8 @@
   <exec_depend>laser_geometry</exec_depend>
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>angles</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <build_depend>jsk_recognition_msgs</build_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
