@@ -43,7 +43,7 @@
 #include <vector>
 
 #include <dynamic_reconfigure/server.h>
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 #include <laser_geometry/laser_geometry.h>
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
